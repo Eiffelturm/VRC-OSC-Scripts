@@ -25,7 +25,7 @@ class NoMediaRunningException(Exception):
     pass
 
 
-config = {'DisplayFormat': "( NP: {song_artist} - {song_title}{song_position} )", 'PausedFormat': "( Playback Paused )"}
+config = {'DisplayFormat': "( NP: {song_artist} - {song_title}{song_position} )", 'PausedFormat': "( Playback Paused )", 'OnlyShowOnChange': False}
 
 last_displayed_song = ("","")
 
@@ -70,8 +70,10 @@ def main():
     if os.path.exists(cfgfile):
         print("[VRCSubs] Loading config from", cfgfile)
         with open(cfgfile, 'r', encoding='utf-8') as f:
-            config = load(f, Loader=Loader)
-
+            new_config = load(f, Loader=Loader)
+            if new_config is not None:
+                for key in new_config:
+                    config[key] = new_config[key]
     print("[VRCNowPlaying] VRCNowPlaying is now running")
     lastPaused = False
     client = udp_client.SimpleUDPClient("127.0.0.1", 9000)
@@ -99,10 +101,13 @@ def main():
         if len(current_song_string) >= 144 :
             current_song_string = current_song_string[:144]
         if current_media_info['status'] == GlobalSystemMediaTransportControlsSessionPlaybackStatus.PLAYING:
+            send_to_vrc = not config['OnlyShowOnChange']
             if last_displayed_song != (song_artist, song_title):
+                send_to_vrc = True
                 last_displayed_song = (song_artist, song_title)
                 print("[VRCNowPlaying]", current_song_string)
-            client.send_message("/chatbox/input", [current_song_string, True])
+            if send_to_vrc:
+                client.send_message("/chatbox/input", [current_song_string, True])
             lastPaused = False
         elif current_media_info['status'] == GlobalSystemMediaTransportControlsSessionPlaybackStatus.PAUSED and not lastPaused:
             client.send_message("/chatbox/input", [config['PausedFormat'], True])
