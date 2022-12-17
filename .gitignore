@@ -134,3 +134,6 @@ VRCNowPlaying/Config.yml
 version.json
 
 .vscode
+
+VRCSubs/Output/
+VRCSubs/Tools/ConfigMigration.exe

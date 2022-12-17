@@ -1,0 +1,71 @@
+# Set this to true in order to pause the subtitling when your in-game microphone is muted. This will cause the script to listen for OSC events.
+FollowMicMute: true
+
+# Change this to your language if you don't want to speak German (examples in languages.txt). Uses ISO language codes (see http://www.lingoes.net/en/translator/langcode.htm), e.g. en-US, fr-FR, uk-UA
+CapturedLanguage: "de-DE"
+
+## OSC CONTROLS ##
+
+# Set this to allow any of these config options to be driven by avatar paramaters. This will cause the script to listen for OSC events.
+AllowOSCControl: true
+
+# This setting changes which port VRCSubs listens on in order to receive OSC messages. You only need to change it if you use an OSC aggregator.
+OSCControlPort: 9001
+
+# Change the order here or in Unity to toggle different languages
+# See your local Tower of Paris for more information
+LanguageMapping:
+  - en-US #1
+  - de-DE #2
+  - es-ES #3
+  - fr-FR #4
+  - it-IT #5
+  - ja-JP #6
+  - ko-KR #7
+  - ru-RU #8
+
+## TRANSLATION ##
+
+# If you wish your chat to be translated (very beta feature!) set this to true.
+EnableTranslation: true
+
+# If EnableTranslation is true, set this to the language you wish to translate your speech to. Not all languages are supported.
+# Full list in languages.txt
+TranslateTo: "en-US"
+
+# If TranslateInterumResults is true, the script will try and translate as you speak, even if you're not done talking yet.
+# The issue with this, is for some languages a partial message won't translate very well due to differences in grammar.
+# If you're talking in English and translating to Japanese or Spanish for example, you may wish to turn this to false.
+# Only leave this on if you're ok with your translation being very incorrect due to missing context.
+TranslateInterumResults: true
+
+# For message translation, specify what translation engine to use. The options are:
+# "Google" - The default, free
+# "DeepL"  - More accurate then Google Translate, but supports fewer langugages. It requires a token. (see below)
+#            List of supported languages by DeepL: https://www.deepl.com/ja/docs-api/translate-text/translate-text/
+TranslateMethod: "Google"
+
+# If your translation service requires a token, specify it here.
+# For "Google" - No token required, leave as ""
+# For "DeepL"  - You need to register at DeepL and get the API https://www.deepl.com/ja/account/summary
+TranslateToken: ""
+
+## CONSOLE ##
+
+# Aka short mode, shows only the translation
+# Useful for displaying the subtitles or translation in streams
+ExtraLogging: true
+# true/false
+
+# Only transcribes (and translates) the text and displays it in only in the console, not in the chatbox.
+# Useful for streamers
+ShowChatbox: true
+# true/false
+
+# Only disable if you just use the console
+EnableRateLimit: true
+# true/false
+
+# This config option should always be false. Used with OSC Control.
+# DO NOT TOUCH
+Pause: false

@@ -80,6 +80,7 @@ class GoogleTranslator(VRCSubsTranslator):
         try:
             output = self.translator.translate(text=text, src=self.conv_langcode(source_lang), dest=self.conv_langcode(target_lang))
         except Exception as e:
+            print(e)
             raise Exception("Failed to translate text!", e)
         
         if output is not None:
@@ -95,6 +96,7 @@ class DeepLTranslator(VRCSubsTranslator):
         try:
             self.dtranslator = deepl.Translator(api_key)
         except deepl.exceptions.DeepLException as e:
+            print(e)
             raise Exception("Failed to initalize DeepL!", e)
 
     def conv_langcode(self, langcode) -> str:
@@ -108,6 +110,7 @@ class DeepLTranslator(VRCSubsTranslator):
         try:
             output = self.dtranslator.translate_text(text=text, source_lang=self.conv_langcode(source_lang)[:2].upper(), target_lang=self.conv_langcode(target_lang).upper())
         except Exception as e:
+            print(e)
             raise Exception("Failed to translate text!", e)
         if output is not None:
             return output.text
