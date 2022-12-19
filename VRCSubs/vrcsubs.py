@@ -69,13 +69,13 @@ def process_sound():
     if config['ExtraLogging']:
         print("[ProcessThread] Starting audio processing!")
     while True:
-        if config["EnableTranslation"] and translator is None:
+        if config['EnableTranslation'] and translator is None:
             tclass = None
             if config['ExtraLogging']:
                 print("[ProcessThread] Enabling Translation!")
-            if config["TranslateMethod"] in Translators.registered_translators:
-                tclass = Translators.registered_translators[config["TranslateMethod"]]
-            targs = config["TranslateToken"]
+            if config['TranslateMethod'] in Translators.registered_translators:
+                tclass = Translators.registered_translators[config['TranslateMethod']]
+            targs = config['TranslateToken']
 
             try:
                 translator = tclass(targs)
@@ -86,16 +86,16 @@ def process_sound():
         
         ad, final = audio_queue.get()
 
-        if config["FollowMicMute"] and get_state("selfMuted"):
+        if config['FollowMicMute'] and get_state("selfMuted"):
             continue
 
-        if config["Pause"]:
+        if config['Pause']:
             continue
 
         if config['ShowChatbox']:
             client.send_message("/chatbox/typing", (not final))
 
-        if config["EnableTranslation"] and not config["TranslateInterumResults"] and not final:
+        if config['EnableTranslation'] and not config['TranslateInterumResults'] and not final:
             continue
 
         text = None
@@ -107,7 +107,7 @@ def process_sound():
         
         try:
             #client.send_message("/chatbox/typing", True)
-            text = r.recognize_google(ad, language=config["CapturedLanguage"])
+            text = r.recognize_google(ad, language=config['CapturedLanguage'])
         except UnknownValueError:
             #client.send_message("/chatbox/typing", False)
             continue
@@ -134,16 +134,27 @@ def process_sound():
                 print("[ProcessThread] Sending too many messages! Delaying by", (ms_to_sleep / 1000.0), "sec to not hit rate limit!")
             time.sleep(ms_to_sleep / 1000.0)
 
-        if config["EnableTranslation"] and translator is not None and config['CapturedLanguage'] != config['TranslateTo']:
+        if config['EnableTranslation'] and translator is not None and config['CapturedLanguage'] != config['TranslateTo']:
             try:
-                trans = translator.translate(source_lang=config["CapturedLanguage"], target_lang=config["TranslateTo"], text=current_text)
                 origin = current_text
-                current_text = trans
+                translation = translator.translate(source_lang=config['CapturedLanguage'], target_lang=config['TranslateTo'], text=current_text)
+
+                if config['EnableSecondTranslation'] and config['TranslateTo'] != config['TranslateToSecond']:
+                    second_translation = translator.translate(source_lang=config['CapturedLanguage'], target_lang=config['TranslateToSecond'], text=current_text)
+                    current_text = config['SecondTranslationFormat'].format(translation=translation, second_translation=second_translation, translation_language=conv_langcode(config['TranslateTo']).upper(), second_translation_language=conv_langcode(config['TranslateToSecond']).upper(), captured_language=config['CapturedLanguage'])
+                else:
+                    current_text = config['TranslationFormat'].format(translation=translation, translation_language=conv_langcode(config['TranslateTo']).upper(), captured_language=config['CapturedLanguage'])
 
                 if config['ExtraLogging']:
-                    print("[Translation]", trans)
+                    # print(f"[ProcessThread] Recognized: {translation} ({origin} [%s->%s])" % (config['CapturedLanguage'], config['TranslateTo']))
+                    print(f"[ProcessThread] Recognized: {translation} ({origin})")
                 else:
-                    print(f"[ProcessThread] Recognized: {trans} ({origin}[%s->%s])" % (config["CapturedLanguage"], config["TranslateTo"]))
+                    # print("[Translation]", translation)
+                    if config['EnableSecondTranslation'] and config['TranslateTo'] != config['TranslateToSecond']:
+                        print(config['ShortSecondTranslationFormat'].format(translation=translation, second_translation=second_translation, translation_language=conv_langcode(config['TranslateTo']).upper(), second_translation_language=conv_langcode(config['TranslateToSecond']).upper(), captured_language=config['CapturedLanguage']))
+                    else:
+                        print(config['ShortTranslationFormat'].format(translation=translation, translation_language=conv_langcode(config['TranslateTo']).upper(), captured_language=config['CapturedLanguage']))
+            
             except Exception as e:
                 print("[ProcessThread] Translating ran into an error!", e)
         else:
@@ -207,7 +218,7 @@ class OSCServer():
         self.dispatcher.map("/avatar/parameters/MuteSelf", self._osc_muteself)
 
         for key in config.keys():
-            if key in ['CapturedLanguage', 'TranslateTo']:
+            if key in ['CapturedLanguage', 'TranslateTo', 'TranslateToSecond']:
                 self.dispatcher.map("/avatar/parameters/vrcsub-%s" % key, self._osc_updatelang)
             else:
                 self.dispatcher.map("/avatar/parameters/vrcsub-%s" % key, self._osc_updateconf)
@@ -274,21 +285,24 @@ def main():
     
     osc = None
     launchOSC = False
-    if config['FollowMicMute']:
-        print("[VRCSubs] FollowMicMute is enabled in the config, speech recognition will pause when your mic is muted in-game!")
+
+    if config['ExtraLogging']:
+        if config['FollowMicMute']:
+            print("[VRCSubs] FollowMicMute is enabled in the config, speech recognition will pause when your mic is muted in-game!")
+        else:
+            print("[VRCSubs] FollowMicMute is NOT enabled in the config, speech recognition will work even while muted in-game!")
+
+        if config['AllowOSCControl']:
+            print("[VRCSubs] AllowOSCControl is enabled in the config, will listen for OSC controls!")
+
+
+        if config['TranslateTo'] == config['CapturedLanguage'] and config['EnableTranslation']:
+            print("[VRCSubs] TranslateTo is set to the same language as CapturedLanguage, translation is disabled!")
+        elif config['EnableTranslation']:
+            print(f"[VRCSubs] Translation is enabled. Recognized text will be translated from {conv_langcode(config['CapturedLanguage']).upper()} to {conv_langcode(config['TranslateTo']).upper()}.")
+
+    if config['AllowOSCControl'] or config['FollowMicMute']:
         launchOSC = True
-    else:
-        print("[VRCSubs] FollowMicMute is NOT enabled in the config, speech recognition will work even while muted in-game!")
-
-    if config['AllowOSCControl']:
-        print("[VRCSubs] AllowOSCControl is enabled in the config, will listen for OSC controls!")
-        launchOSC = True
-
-
-    if config['TranslateTo'] == config['CapturedLanguage'] and config['EnableTranslation']:
-        print("[VRCSubs] TranslateTo is set to the same language as CapturedLanguage, translation is disabled!")
-    elif config['EnableTranslation']:
-        print(f"[VRCSubs] Translation is enabled. Recognized text will be translated from {conv_langcode(config['CapturedLanguage']).upper()} to {conv_langcode(config['TranslateTo']).upper()}.")
 
     if launchOSC:
         osc = OSCServer()

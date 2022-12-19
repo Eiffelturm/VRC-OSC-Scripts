@@ -11,7 +11,12 @@ if old_config == "":
     messagebox.showerror("Missing file", "You didn't select a file!")
     quit()
 
-new_config = filedialog.askopenfilename(filetypes=[('VRChat YML Config Files', '.yml')], title="Select new config")
+try:
+    with open("Config.yml", "r") as f:
+        new_config = "Config.yml"
+except FileNotFoundError:
+    new_config = filedialog.askopenfilename(filetypes=[('VRChat YML Config Files', '.yml')], title="Select new config", initialdir=".", initialfile="Config.yml")
+
 if new_config == "":
     messagebox.showerror("Missing file", "You didn't select a file!")
     quit()
@@ -37,6 +42,7 @@ with open(new_config, "r") as f:
             else:
                 print(f"{value} didn't change...\n")
         except KeyError:
+            print(f"Removed {value}...")
             removed += 1
             pass
             # new_data.insert(0, value, old_data[value], "Added by config migration")
