@@ -120,6 +120,8 @@ def process_sound():
             #client.send_message("/chatbox/typing", False)
             continue
 
+        text = text.replace(" Eifel ", " Eiffel ")
+
         current_text = text
 
         if last_text == current_text:

@@ -1,8 +1,8 @@
 import requests, os, json, zipfile, io, glob, shutil
 
 API_BASE = "https://api.github.com"
-REPO_OWNER = "cyberkitsune"
-REPO_NAME = "vrc-osc-scripts"
+REPO_OWNER = "Eiffelturm"
+REPO_NAME = "VRC-OSC-Scripts"
 REPO_BRANCH = "main"
 
 def fetch_last_commit_info():
@@ -63,6 +63,3 @@ if __name__ == "__main__":
 
     save_json(hash, author, message)
     print("[Updatecheck] Update complete!")
-            
-
-    
