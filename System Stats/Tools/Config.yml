@@ -1,0 +1,28 @@
+# Enabling this option generally provides more accurate results than the average
+DisplayMaxCPUCore: true
+
+AMDMode: false
+
+## COMPONENTS ##
+
+DisplayCPU: true
+
+DisplayRAM: true
+
+DisplayGPUName: true
+
+DisplayTemperature: true
+
+DisplayFans: true
+
+DisplayPower: true
+
+## FORMAT ##
+
+Format: "CPU: {cpu}% | RAM: {ram}% | {gpu_name}: {temperature}C / Fans {fans} / {power}W"
+
+AMDFormat: "CPU: {cpu}% | RAM: {ram}%"
+
+# This config option should always be false. Used with OSC Control.
+# DO NOT TOUCH
+Pause: false

@@ -1,0 +1,4 @@
+# Display format for the clock
+# ClockFormat: "%H:%M:%S"
+# ClockFormat: "%H:%M"
+ClockFormat: "{timezone}: %H:%M"

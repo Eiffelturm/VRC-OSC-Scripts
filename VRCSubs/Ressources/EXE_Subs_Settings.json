@@ -7,7 +7,7 @@
   },
   {
    "optionDest": "filenames",
-   "value": "C:/Users/miche/Documents/VRC OSC Scripts/vrc-osc-scripts/VRCSubs/VRCSubs.py"
+   "value": "C:/Users/miche/Documents/VRC OSC Scripts/VRCSubs/VRCSubs.py"
   },
   {
    "optionDest": "onefile",
@@ -19,7 +19,7 @@
   },
   {
    "optionDest": "icon_file",
-   "value": "C:/Users/miche/Documents/VRC OSC Scripts/vrc-osc-scripts/VRCSubs/Tools/Icon.ico"
+   "value": "C:/Users/miche/Documents/VRC OSC Scripts/VRCSubs/Tools/Icon.ico"
   },
   {
    "optionDest": "ascii",
@@ -71,7 +71,7 @@
   },
   {
    "optionDest": "datas",
-   "value": "C:/Users/miche/Documents/VRC OSC Scripts/vrc-osc-scripts/VRCSubs/Tools;Tools/"
+   "value": "C:/Users/miche/Documents/VRC OSC Scripts/VRCSubs/Tools;Tools/"
   }
  ],
  "nonPyinstallerOptions": {

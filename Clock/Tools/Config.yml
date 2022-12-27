@@ -1,0 +1,8 @@
+# Display format for the clock
+# ClockFormat: "%H:%M:%S"
+ClockFormat: "%H:%M"
+# ClockFormat: "{timezone}: %H:%M"
+
+# This config option should always be false. Used with OSC Control.
+# DO NOT TOUCH
+Pause: false

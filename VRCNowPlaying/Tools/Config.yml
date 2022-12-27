@@ -1,0 +1,12 @@
+# Configure what is shown while you're listening to a song. Use {song_artist}, {song_title}, and {song_position} as placeholders.
+DisplayFormat: "🎵 {song_artist} - {song_title}{song_position}"
+
+# Configure what is shown when you pause media.
+PausedFormat: "⏸️ Playback Paused"
+
+# If you only want the np box to show on track change, set this to true.
+OnlyShowOnChange: false
+
+# This config option should always be false. Used with OSC Control.
+# DO NOT TOUCH
+Pause: false

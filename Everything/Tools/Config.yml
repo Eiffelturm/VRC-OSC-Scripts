@@ -1,0 +1,90 @@
+EnableNowPlaying: true
+# true
+# false
+
+EnableSystemStats: true
+# true
+# false
+
+EnableClock: true
+# true
+# false
+
+EnableCustomStatus: false
+# true
+# false
+
+# Delay between messages in seconds, lower values may rate limit your messages
+Delay: 0.05
+
+# This config option should always be false. Used with OSC Control.
+# DO NOT TOUCH
+Pause: false
+
+
+
+
+## NOW PLAYING ##
+
+# Configure what is shown while you're listening to a song. Use {song_artist}, {song_title}, and {song_position} as placeholders.
+# DisplayFormat: "Now playing: {song_artist} - {song_title}{song_position}"
+MusicFormat: "🎵 {song_artist} - {song_title}{song_position}"
+
+# Configure what is shown in the console when you pause media.
+# PausedFormat: "(Playback Paused)"
+PausedFormat: "Nothing playing"
+
+# If music is playing, speed up the display duration of the other messages
+OverrideMusic: false
+# true
+# false
+
+OverrideMusicDelay: 0.02
+
+
+
+
+
+## SYSTEM STATS ##
+
+# Enabling this option generally provides more accurate results than the average
+DisplayMaxCPUCore: true
+
+AMDMode: false
+
+DisplayCPU: true
+
+DisplayRAM: true
+
+DisplayGPUName: true
+
+DisplayTemperature: true
+
+DisplayFans: true
+
+DisplayPower: true
+
+Format: "CPU: {cpu}% | RAM: {ram}% | {gpu_name}: {temperature}C / Fans {fans} / {power}W"
+
+AMDFormat: "CPU: {cpu}% | RAM: {ram}%"
+
+## CLOCK ##
+
+# Display format for the clock
+# ClockFormat: "%H:%M:%S"
+ClockFormat: "%H:%M"
+# ClockFormat: "{timezone}: %H:%M"
+
+
+
+
+
+## CUSTOM STATUS ##
+
+# Text to display if Custom Status is enabled (maximum of 144 characters)
+CustomStatus: 'AFK, be right back'
+
+CustomStatusMapping:
+  - 'AFK, be right back' #0
+  - 'Eating something' #1
+  - 'Working in Unity' #2

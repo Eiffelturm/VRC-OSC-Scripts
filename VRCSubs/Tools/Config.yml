@@ -23,7 +23,7 @@ LanguageMapping:
 ## TRANSLATION ##
 
 # If you wish your text to be translated, set this to true.
-EnableTranslation: true
+EnableTranslation: false
 EnableSecondTranslation: false
 
 # If EnableTranslation is true, set this to the language you wish to translate your speech to. Not all languages are supported.
@@ -39,10 +39,12 @@ TranslateInterumResults: true
 
 TranslationFormat: '{translation}'
 # Available variables
+# - {text}
 # - {captured_language}
 # - {translation}
 # - {translation_language}
 SecondTranslationFormat: '{translation} / {second_translation}'
+# - All of the above and plus
 # - {second_translation}
 # - {second_translation_language}
 
@@ -68,12 +70,17 @@ TranslateToken: ''
 ExtraLogging: true
 # true/false
 
+RecognitionFormat: '[Recognized] {text}'
+# {text} will display the recognized text
+
 ShortTranslationFormat: '[Translation] {translation}'
 # Available variables
+# - {text}
 # - {captured_language}
 # - {translation}
 # - {translation_language}
 ShortSecondTranslationFormat: '[Translation] {translation} | {second_translation}'
+# - All of the above plus
 # - {second_translation}
 # - {second_translation_language}
 

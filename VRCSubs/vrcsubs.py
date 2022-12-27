@@ -8,15 +8,21 @@ import speech_recognition as sr
 import Translators
 
 from speech_recognition import UnknownValueError, WaitTimeoutError, AudioData
-from pythonosc import udp_client
-from pythonosc.dispatcher import Dispatcher
-from pythonosc.osc_server import BlockingOSCUDPServer
 from yaml import load
 try:
     from yaml import CLoader as Loader
 except ImportError:
     from yaml import Loader
 
+# OSC
+from pythonosc import udp_client
+from pythonosc.dispatcher import Dispatcher
+from pythonosc.osc_server import BlockingOSCUDPServer
+
+os.system("title " + os.path.basename(__file__).replace(".py", ""))
+
+print("[VRCSubs ©️ CyberKitsune, Eiffelturm and other contributors] VRCSubs is now running")
+print("Find more scripts and updates at https://cloud.gamingecke.space/s/OSCScripts | News and changelogs at https://social.gamingecke.space/@eiffelturm")
 
 config = {'FollowMicMute': True, 'CapturedLanguage': "en-US", 'EnableTranslation': False, 'TranslateMethod': "Google", 'TranslateToken': "", "TranslateTo": "en-US", 'AllowOSCControl': True, 'Pause': False, 'TranslateInterumResults': True, 'OSCControlPort': 9001}
 state = {'selfMuted': False}
@@ -143,9 +149,9 @@ def process_sound():
 
                 if config['EnableSecondTranslation'] and config['TranslateTo'] != config['TranslateToSecond']:
                     second_translation = translator.translate(source_lang=config['CapturedLanguage'], target_lang=config['TranslateToSecond'], text=current_text)
-                    current_text = config['SecondTranslationFormat'].format(translation=translation, second_translation=second_translation, translation_language=conv_langcode(config['TranslateTo']).upper(), second_translation_language=conv_langcode(config['TranslateToSecond']).upper(), captured_language=config['CapturedLanguage'])
+                    current_text = config['SecondTranslationFormat'].format(translation=translation, second_translation=second_translation, translation_language=conv_langcode(config['TranslateTo']).upper(), second_translation_language=conv_langcode(config['TranslateToSecond']).upper(), captured_language=config['CapturedLanguage'], text=text)
                 else:
-                    current_text = config['TranslationFormat'].format(translation=translation, translation_language=conv_langcode(config['TranslateTo']).upper(), captured_language=config['CapturedLanguage'])
+                    current_text = config['TranslationFormat'].format(translation=translation, translation_language=conv_langcode(config['TranslateTo']).upper(), captured_language=config['CapturedLanguage'], text=text)
 
                 if config['ExtraLogging']:
                     # print(f"[ProcessThread] Recognized: {translation} ({origin} [%s->%s])" % (config['CapturedLanguage'], config['TranslateTo']))
@@ -153,14 +159,14 @@ def process_sound():
                 else:
                     # print("[Translation]", translation)
                     if config['EnableSecondTranslation'] and config['TranslateTo'] != config['TranslateToSecond']:
-                        print(config['ShortSecondTranslationFormat'].format(translation=translation, second_translation=second_translation, translation_language=conv_langcode(config['TranslateTo']).upper(), second_translation_language=conv_langcode(config['TranslateToSecond']).upper(), captured_language=config['CapturedLanguage']))
+                        print(config['ShortSecondTranslationFormat'].format(translation=translation, second_translation=second_translation, translation_language=conv_langcode(config['TranslateTo']).upper(), second_translation_language=conv_langcode(config['TranslateToSecond']).upper(), captured_language=config['CapturedLanguage'], text=text))
                     else:
-                        print(config['ShortTranslationFormat'].format(translation=translation, translation_language=conv_langcode(config['TranslateTo']).upper(), captured_language=config['CapturedLanguage']))
+                        print(config['ShortTranslationFormat'].format(translation=translation, translation_language=conv_langcode(config['TranslateTo']).upper(), captured_language=config['CapturedLanguage'], text=text))
             
             except Exception as e:
-                print("[ProcessThread] Translating ran into an error!", e)
+                print("[] Translating ran into an error!", e)
         else:
-            print("[ProcessThread] Recognized:", current_text)
+            print(config['RecognitionFormat'].format(text=text))
 
         if config['ShowChatbox']:
             if len(current_text) > 144:
@@ -221,9 +227,9 @@ class OSCServer():
 
         for key in config.keys():
             if key in ['CapturedLanguage', 'TranslateTo', 'TranslateToSecond']:
-                self.dispatcher.map("/avatar/parameters/vrcsub-%s" % key, self._osc_updatelang)
+                self.dispatcher.map("/avatar/parameters/vrcosc-%s" % key, self._osc_updatelang)
             else:
-                self.dispatcher.map("/avatar/parameters/vrcsub-%s" % key, self._osc_updateconf)
+                self.dispatcher.map("/avatar/parameters/vrcosc-%s" % key, self._osc_updateconf)
 
         self.server = BlockingOSCUDPServer(("127.0.0.1", config['OSCControlPort']), self.dispatcher)
         self.server_thread = threading.Thread(target=self._process_osc)
@@ -241,13 +247,13 @@ class OSCServer():
         set_state("selfMuted", args[0])
 
     def _osc_updateconf(self, address: str, *args):
-        key = address.split("vrcsub-")[1]
+        key = address.split("vrcosc-")[1]
         if config['ExtraLogging']:
             print("[OSCThread]", key, "is now", args[0])
         config[key] = args[0]
 
     def _osc_updatelang(self, address: str, language_int: int):
-        key = address.split("vrcsub-")[1]
+        key = address.split("vrcosc-")[1]
         if config['ExtraLogging']:
             print("[OSCThread]", key, "is now", config['LanguageMapping'][language_int])
         config[key] = config['LanguageMapping'][language_int]
@@ -272,7 +278,7 @@ def main():
     if os.path.exists(cfgfile):
         print("[VRCSubs] Loading config from", cfgfile)
         new_config = None
-        with open(cfgfile, 'r') as f:
+        with open(cfgfile, 'r', encoding="UTF-8") as f:
             new_config = load(f, Loader=Loader)
         if new_config is not None:
             for key in new_config:

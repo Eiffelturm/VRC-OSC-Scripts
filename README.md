@@ -12,7 +12,7 @@ If you want a quick video tutorial on how to use these scripts, check this [vide
 ## VRCSubs
 This script attempts to auto-transcribe your microphone audio into chat bubbles using the Google Web Search Speech API (via the `SpeechRecognition` package) -- It's considered a prototype and has some issues, but is kinda neat!
 
-![VRCSubs in action!](https://raw.githubusercontent.com/Eiffelturm/VRC-OSC-Scripts/main/img/subtitles.gif)
+![VRCSubs in action!](https://raw.githubusercontent.com/Eiffelturm/VRC-OSC-Scripts/main/Screenshots/subtitles.gif)
 
 ### Usage
 #### Auto
@@ -44,7 +44,7 @@ There is a prototype live translation function in VRCSubs. It's considered a pro
 ## VRCNowplaying
 This script broadcasts what you're currently listening to your chatbox, grabbing the data from the Windows MediaManager API.
 
-![VRCNowplaying in action!](https://raw.githubusercontent.com/Eiffelturm/VRC-OSC-Scripts/main/img/nowplaying.gif)
+![VRCNowplaying in action!](https://raw.githubusercontent.com/Eiffelturm/VRC-OSC-Scripts/main/Screenshots/nowplaying.gif)
 
 ### Usage
 #### Auto

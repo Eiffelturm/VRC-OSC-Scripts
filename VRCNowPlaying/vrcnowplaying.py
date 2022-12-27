@@ -20,10 +20,17 @@ from winsdk.windows.media.control import \
 from winsdk.windows.media.control import \
     GlobalSystemMediaTransportControlsSessionPlaybackStatus
 
+# OSC
+import threading
+
+from pythonosc import udp_client
+from pythonosc.dispatcher import Dispatcher
+from pythonosc.osc_server import BlockingOSCUDPServer
 
 class NoMediaRunningException(Exception):
     pass
 
+os.system("title " + os.path.basename(__file__).replace(".py", ""))
 
 config = {'DisplayFormat': "( NP: {song_artist} - {song_title}{song_position} )", 'PausedFormat': "( Playback Paused )", 'OnlyShowOnChange': False}
 
@@ -63,21 +70,14 @@ def get_td_string(td):
     minutes, seconds = divmod(seconds, 60)
     return '%i:%02i' % (minutes, seconds)
 
-def main():
+def sending():
     global config, last_displayed_song
-    # Load config
-    cfgfile = f"{os.path.dirname(os.path.realpath(__file__))}/Config.yml"
-    if os.path.exists(cfgfile):
-        print("[VRCSubs] Loading config from", cfgfile)
-        with open(cfgfile, 'r', encoding='utf-8') as f:
-            new_config = load(f, Loader=Loader)
-            if new_config is not None:
-                for key in new_config:
-                    config[key] = new_config[key]
-    print("[VRCNowPlaying] VRCNowPlaying is now running")
     lastPaused = False
     client = udp_client.SimpleUDPClient("127.0.0.1", 9000)
     while True:
+        if config['Pause']:
+            continue
+
         try:
             current_media_info = asyncio.run(get_media_info()) # Fetches currently playing song for winsdk 
         except NoMediaRunningException:
@@ -115,6 +115,61 @@ def main():
             last_displayed_song = ("", "")
             lastPaused = True
         time.sleep(1.5) # 1.5 sec delay to update with no flashing
+
+class OSCServer():
+    def __init__(self):
+        global config
+        self.dispatcher = Dispatcher()
+        self.dispatcher.set_default_handler(self._def_osc_dispatch)
+
+        for key in config.keys():
+            self.dispatcher.map("/avatar/parameters/vrcosc-%s" % key, self._osc_updateconf)
+
+        self.server = BlockingOSCUDPServer(("127.0.0.1", 9001), self.dispatcher)
+        self.server_thread = threading.Thread(target=self._process_osc)
+
+    def launch(self):
+        self.server_thread.start()
+
+    def shutdown(self):
+        self.server.shutdown()
+        self.server_thread.join()
+
+    def _osc_updateconf(self, address: str, *args):
+        key = address.split("vrcosc-")[1]
+        print("[OSCThread]", key, "is now", args[0])
+        config[key] = args[0]
+
+    def _def_osc_dispatch(self, address, *args):
+        pass
+        #print(f"{address}: {args}")
+
+    def _process_osc(self):
+        print("[OSCThread] Launching OSC server thread!")
+        self.server.serve_forever()
+
+def main():
+    global config
+    # Load config
+    cfgfile = f"{os.path.dirname(os.path.realpath(__file__))}/Config.yml"
+    if os.path.exists(cfgfile):
+        print("[VRCSubs] Loading config from", cfgfile)
+        with open(cfgfile, 'r', encoding='utf-8') as f:
+            new_config = load(f, Loader=Loader)
+            if new_config is not None:
+                for key in new_config:
+                    config[key] = new_config[key]
+
+    send_thread = threading.Thread(target=sending)
+    send_thread.start()
+
+    osc = OSCServer()
+    osc.launch()
+
+    send_thread.join()
+
+    if osc is not None:
+        osc.shutdown()
 
 if __name__ == "__main__":
     main()
