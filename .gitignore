@@ -135,6 +135,6 @@ version.json
 
 .vscode
 
-VRCSubs/Output/
+*Output/
 VRCSubs/Tools/ConfigMigration.exe
 Wombo
