@@ -17,9 +17,6 @@ EnableCustomStatus: false
 # Delay between messages in seconds, lower values may rate limit your messages
 Delay: 0.05
 
-# This config option should always be false. Used with OSC Control.
-# DO NOT TOUCH
-Pause: false
 
 
 
@@ -35,7 +32,7 @@ MusicFormat: "🎵 {song_artist} - {song_title}{song_position}"
 PausedFormat: "Nothing playing"
 
 # If music is playing, speed up the display duration of the other messages
-OverrideMusic: false
+OverrideMusic: true
 # true
 # false
 
@@ -52,21 +49,23 @@ DisplayMaxCPUCore: true
 
 AMDMode: false
 
-DisplayCPU: true
-
-DisplayRAM: true
-
-DisplayGPUName: true
-
-DisplayTemperature: true
-
-DisplayFans: true
-
-DisplayPower: true
-
 Format: "CPU: {cpu}% | RAM: {ram}% | {gpu_name}: {temperature}C / Fans {fans} / {power}W"
 
 AMDFormat: "CPU: {cpu}% | RAM: {ram}%"
+
+# OPTIONS WORK IN PROGRESS
+
+# DisplayCPU: true
+
+# DisplayRAM: true
+
+# DisplayGPUName: true
+
+# DisplayTemperature: true
+
+# DisplayFans: true
+
+# DisplayPower: true
 
 ## CLOCK ##
 
@@ -84,7 +83,23 @@ ClockFormat: "%H:%M"
 # Text to display if Custom Status is enabled (maximum of 144 characters)
 CustomStatus: 'AFK, be right back'
 
+EnableWhenAFK: true
+
 CustomStatusMapping:
   - 'AFK, be right back' #0
   - 'Eating something' #1
   - 'Working in Unity' #2
+  - 'Sleeping' #3
+
+
+
+
+
+## DO NOT TOUCH ##
+# This config options should always be false. Used with OSC Control.
+
+Pause: false
+
+AFK: false
+
+Earmuffs: false

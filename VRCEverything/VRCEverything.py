@@ -14,7 +14,6 @@ VRCSystemStats
 
 import asyncio
 import time, os
-import unidecode
 import traceback
 from datetime import timedelta
 from pythonosc import udp_client
@@ -54,7 +53,8 @@ config = {
     'ClockFormat': '{timezone}: %H:%M',
     'Delay': 5,
     'OverrideMusic': True,
-    'OverrideMusicDelay': 2
+    'OverrideMusicDelay': 2,
+    'AFK': False
     }
 
 last_displayed_song = ("","")
@@ -96,9 +96,9 @@ def get_td_string(td):
     minutes, seconds = divmod(seconds, 60)
     return '%i:%02i' % (minutes, seconds)
 
-def replace_umlauts(text: str):
-    vowel_char_map = {ord('ä'):'ae', ord('ü'):'ue', ord('ö'):'oe', ord('ß'):'ss'}
-    return text.translate(vowel_char_map)
+# def replace_umlauts(text: str):
+#     vowel_char_map = {ord('ä'):'ae', ord('ü'):'ue', ord('ö'):'oe', ord('ß'):'ss'}
+#     return text.translate(vowel_char_map)
 
 def sending():
     global config, last_displayed_song
@@ -109,9 +109,7 @@ def sending():
         if config['Pause']:
             continue
 
-        if config['EnableNowPlaying'] is True:
-            if config['Pause']:
-                continue
+        if config['EnableNowPlaying'] and not (config['EnableWhenAFK'] and config['AFK']):
             for i in range(int(config['Delay'] * 100)):
                 try:
                     current_media_info = asyncio.run(get_media_info()) # Fetches currently playing song for winsdk
@@ -155,9 +153,10 @@ def sending():
         # Clock
         
         if config['Pause']:
+            print("Skipping")
             continue
 
-        if config['EnableClock'] is True:
+        if config['EnableClock'] and not (config['EnableWhenAFK'] and config['AFK']):
             current_time = time.strftime((config['ClockFormat']), time.localtime())
             current_time = current_time.format(timezone = time.tzname[1])
                 
@@ -171,7 +170,7 @@ def sending():
             continue
 
         statsDisplayed = False
-        if config['EnableSystemStats'] is True:
+        if config['EnableSystemStats'] and not (config['EnableWhenAFK'] and config['AFK']):
             for i in range(delay):
                 if config['DisplayMaxCPUCore'] is True:
                     cpu = max(psutil.cpu_percent(percpu=True))
@@ -215,16 +214,28 @@ def sending():
         if config['Pause']:
             continue
 
-        if config['EnableCustomStatus'] is True:
+        if config['EnableCustomStatus'] or (config['EnableWhenAFK'] and config['AFK']):
             print("[VRCCustomStatus]", config['CustomStatus'])
             client.send_message("/chatbox/input", (config['CustomStatus'], True))
-            time.sleep(delay)
+            
+            if (config['EnableWhenAFK'] and config['AFK']):
+                time.sleep(config['Delay'] * 100)
+            else:
+                time.sleep(delay)
+
+        # Earmuffs
+
+        # if config['Pause']:
+        #     continue
 
 class OSCServer():
     def __init__(self):
         global config
         self.dispatcher = Dispatcher()
         self.dispatcher.set_default_handler(self._def_osc_dispatch)
+
+        self.dispatcher.map("/avatar/parameters/AFK", self._osc_updateafk)
+        self.dispatcher.map("/avatar/parameters/Earmuffs", self._osc_updateconf)
 
         for key in config.keys():
             if key == 'CustomStatus':
@@ -251,6 +262,17 @@ class OSCServer():
         key = address.split("vrcosc-")[1]
         print(f"[OSCThread] {key} is now '{config['CustomStatusMapping'][status_int]}'")
         config[key] = config['CustomStatusMapping'][status_int]
+
+    def _osc_updateafk(self, address: str, afk_value: bool):
+        if config['EnableWhenAFK'] is False:
+            return
+
+        if afk_value:
+            print(f"[OSCThread] Now AFK, enabling VRCCustomStatus and disabling other modules")
+        else:
+            print(f"[OSCThread] No longer AFK, reverting to original settings")
+        
+        config['AFK'] = afk_value
 
     def _def_osc_dispatch(self, address, *args):
         pass

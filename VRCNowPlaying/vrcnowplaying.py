@@ -151,7 +151,7 @@ class OSCServer():
 def main():
     global config
     # Load config
-    cfgfile = f"{os.path.dirname(os.path.realpath(__file__))}/Config.yml"
+    cfgfile = f"{os.path.dirname(os.path.realpath(__file__))}/Tools/Config.yml"
     if os.path.exists(cfgfile):
         print("[VRCSubs] Loading config from", cfgfile)
         with open(cfgfile, 'r', encoding='utf-8') as f:
